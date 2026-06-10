@@ -39,7 +39,10 @@ def add_reminder(medicine_name: str,
     )
     db.add(new_medicine)
     db.commit()
-    set_reminder(medicine_name, dose, reminder_time)
+    try:
+        set_reminder(medicine_name, dose, reminder_time)
+    except Exception as e:
+        print(f"Reminder error: {e}")
     return {
         "message": "Reminder set and saved!",
         "medicine": medicine_name,
