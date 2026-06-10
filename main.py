@@ -26,18 +26,36 @@ def start_reminders():
     thread.start()
     print("✅ Reminder system started!")
 
-# Set a reminder for medicine
+# Set a reminder AND save medicine to database
 @app.post("/medicines/reminder")
 def add_reminder(medicine_name: str,
                  dose: str,
                  reminder_time: str,
                  db: Session = Depends(get_db)):
+    new_medicine = Medicine(
+        name=medicine_name,
+        dose=dose,
+        time=reminder_time
+    )
+    db.add(new_medicine)
+    db.commit()
     set_reminder(medicine_name, dose, reminder_time)
     return {
-        "message": f"Reminder set!",
+        "message": "Reminder set and saved!",
         "medicine": medicine_name,
         "time": reminder_time,
         "dose": dose
+    }
+
+# GET all medicines for the app
+@app.get("/medicines")
+def get_medicines(db: Session = Depends(get_db)):
+    medicines = db.query(Medicine).all()
+    return {
+        "medicines": [
+            {"name": m.name, "dose": m.dose, "time": m.time}
+            for m in medicines
+        ]
     }
 
 # REGISTER - create new account
