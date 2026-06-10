@@ -12,6 +12,7 @@ class Medicine(Base):
     name = Column(String)
     time = Column(String)
     dose = Column(String)
+    days = Column(String)
 
 class User(Base):
     __tablename__ = "users"

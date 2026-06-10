@@ -31,18 +31,20 @@ def start_reminders():
 def add_reminder(medicine_name: str,
                  dose: str,
                  reminder_time: str,
+                 days: str = "Daily",
                  db: Session = Depends(get_db)):
     new_medicine = Medicine(
         name=medicine_name,
         dose=dose,
-        time=reminder_time
+        time=reminder_time,
+        days=days
     )
     db.add(new_medicine)
     db.commit()
     try:
         set_reminder(medicine_name, dose, reminder_time)
     except Exception as e:
-        print(f"Reminder error: {e}")
+        print(f"Reminder error: {e}")   
     return {
         "message": "Reminder set and saved!",
         "medicine": medicine_name,
@@ -56,7 +58,8 @@ def get_medicines(db: Session = Depends(get_db)):
     medicines = db.query(Medicine).all()
     return {
         "medicines": [
-            {"name": m.name, "dose": m.dose, "time": m.time}
+            {"name": m.name, "dose": m.dose,
+             "time": m.time, "days": m.days}
             for m in medicines
         ]
     }
