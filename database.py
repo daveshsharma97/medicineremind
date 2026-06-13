@@ -1,8 +1,17 @@
+import os
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine("sqlite:///medicines.db")
+# Use PostgreSQL if available, else SQLite for local testing
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///medicines.db")
+
+# Fix for SQLAlchemy: postgres:// must be postgresql://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgres://", "postgresql://", 1)
+
+engine = create_engine(DATABASE_URL)
 
 Base = declarative_base()
 
