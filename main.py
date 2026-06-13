@@ -82,12 +82,12 @@ def register(name: str, phone: str,
 
 # LOGIN - enter existing account
 @app.post("/login")
-def login(phone: str, password: str, 
+def login(phone: str, password: str,
           db: Session = Depends(get_db)):
     user = db.query(User).filter(User.phone == phone).first()
     if not user or not verify_password(password, user.password):
-        raise HTTPException(status_code=401, 
-                          detail="Wrong phone or password!")
+        raise HTTPException(status_code=401,
+                            detail="Wrong phone or password!")
     return {"message": "Login successful!", "name": user.name}
     
     # SOS Emergency Button
