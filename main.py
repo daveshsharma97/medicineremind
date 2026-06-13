@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from database import SessionLocal, Medicine, User, FamilyMember
+from database import SessionLocal, Medicine, User, FamilyMember, TakenRecord
 from auth import hash_password, verify_password
 from reminder import set_reminder, run_reminders
 import threading
@@ -142,4 +142,32 @@ def family_view(
     return {
         "medicines": medicines,
         "family_members": family
+    }
+    # Mark medicine as taken
+@app.post("/taken")
+def mark_taken(phone: str, medicine_name: str, db: Session = Depends(get_db)):
+    from datetime import datetime
+    new_record = TakenRecord(
+        phone=phone,
+        medicine_name=medicine_name,
+        taken_date=datetime.now().strftime("%Y-%m-%d"),
+        taken_time=datetime.now().strftime("%H:%M")
+    )
+    db.add(new_record)
+    db.commit()
+    return {"message": "Marked as taken!"}
+
+
+# Get taken records for a phone
+@app.get("/taken/{phone}")
+def get_taken(phone: str, db: Session = Depends(get_db)):
+    records = db.query(TakenRecord).filter(
+        TakenRecord.phone == phone).all()
+    return {
+        "taken": [
+            {"medicine": r.medicine_name,
+             "date": r.taken_date,
+             "time": r.taken_time}
+            for r in records
+        ]
     }
