@@ -28,6 +28,13 @@ class FamilyMember(Base):
     family_name = Column(String)
     family_phone = Column(String)
     relation = Column(String)
+class TakenRecord(Base):
+    __tablename__ = "taken_records"
+    id = Column(Integer, primary_key=True)
+    phone = Column(String)
+    medicine_name = Column(String)
+    taken_date = Column(String)
+    taken_time = Column(String)
 
 # This line always stays at the VERY BOTTOM!
 Base.metadata.create_all(engine)
