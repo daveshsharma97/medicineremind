@@ -171,3 +171,14 @@ def get_taken(phone: str, db: Session = Depends(get_db)):
             for r in records
         ]
     }
+    @app.delete("/medicines/{medicine_id}")
+def delete_medicine(medicine_id: int):
+    db = SessionLocal()
+    medicine = db.query(Medicine).filter(Medicine.id == medicine_id).first()
+    if medicine:
+        db.delete(medicine)
+        db.commit()
+        db.close()
+        return {"message": "Medicine deleted"}
+    db.close()
+    return {"message": "Medicine not found"}
