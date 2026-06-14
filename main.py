@@ -58,7 +58,7 @@ def get_medicines(db: Session = Depends(get_db)):
     medicines = db.query(Medicine).all()
     return {
         "medicines": [
-            {"name": m.name, "dose": m.dose,
+            {"id": m.id, "name": m.name, "dose": m.dose,
              "time": m.time, "days": m.days}
             for m in medicines
         ]
