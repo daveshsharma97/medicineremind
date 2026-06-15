@@ -32,12 +32,25 @@ def add_reminder(medicine_name: str,
                  dose: str,
                  reminder_time: str,
                  days: str = "Daily",
+                 duration: str = "Ongoing",
                  db: Session = Depends(get_db)):
+    from datetime import datetime, timedelta
+    # Calculate end date based on duration
+    end_date = ""
+    if duration == "7 days":
+        end_date = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
+    elif duration == "1 month":
+        end_date = (datetime.now() + timedelta(days=30)).strftime("%Y-%m-%d")
+    elif duration == "3 months":
+        end_date = (datetime.now() + timedelta(days=90)).strftime("%Y-%m-%d")
+    # Ongoing = empty (never expires)
+
     new_medicine = Medicine(
         name=medicine_name,
         dose=dose,
         time=reminder_time,
-        days=days
+        days=days,
+        end_date=end_date
     )
     db.add(new_medicine)
     db.commit()
@@ -53,16 +66,7 @@ def add_reminder(medicine_name: str,
     }
 
 # GET all medicines for the app
-@app.get("/medicines")
-def get_medicines(db: Session = Depends(get_db)):
-    medicines = db.query(Medicine).all()
-    return {
-        "medicines": [
-            {"id": m.id, "name": m.name, "dose": m.dose,
-             "time": m.time, "days": m.days}
-            for m in medicines
-        ]
-    }
+
 
 # REGISTER - create new account
 @app.post("/register")

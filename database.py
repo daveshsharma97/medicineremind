@@ -17,11 +17,12 @@ Base = declarative_base()
 
 class Medicine(Base):
     __tablename__ = "medicines"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     time = Column(String)
     dose = Column(String)
     days = Column(String)
+    end_date = Column(String, default="")
 
 class User(Base):
     __tablename__ = "users"
