@@ -50,3 +50,13 @@ class TakenRecord(Base):
 Base.metadata.create_all(engine)
 
 SessionLocal = sessionmaker(bind=engine)
+# Add end_date column if it doesn't exist (migration)
+from sqlalchemy import text
+try:
+    with engine.connect() as conn:
+        conn.execute(text(
+            "ALTER TABLE medicines ADD COLUMN IF NOT EXISTS end_date VARCHAR DEFAULT ''"))
+        conn.commit()
+        print("✅ end_date column ready")
+except Exception as e:
+    print(f"Migration note: {e}")
