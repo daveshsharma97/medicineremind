@@ -66,6 +66,29 @@ def add_reminder(medicine_name: str,
     }
 
 # GET all medicines for the app
+@app.get("/medicines")
+def get_medicines(db: Session = Depends(get_db)):
+    from datetime import datetime
+    today = datetime.now().strftime("%Y-%m-%d")
+    medicines = db.query(Medicine).all()
+
+    # Auto-delete expired medicines
+    active_medicines = []
+    for m in medicines:
+        if m.end_date and m.end_date != "" and m.end_date < today:
+            db.delete(m)
+        else:
+            active_medicines.append(m)
+    db.commit()
+
+    return {
+        "medicines": [
+            {"id": m.id, "name": m.name, "dose": m.dose,
+             "time": m.time, "days": m.days,
+             "end_date": m.end_date}
+            for m in active_medicines
+        ]
+    }
 
 
 # REGISTER - create new account
