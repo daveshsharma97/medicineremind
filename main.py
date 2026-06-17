@@ -212,14 +212,10 @@ def delete_medicine(medicine_id: int):
     db.close()
     return {"message": "Medicine not found"}
 
-    @app.delete("/account/{phone}")
+@app.delete("/account/{phone}")
 def delete_account(phone: str, db: Session = Depends(get_db)):
-    # Delete user's medicines (if linked by phone - optional)
-    # Delete the user
     user = db.query(User).filter(User.phone == phone).first()
-    # Delete taken records
     db.query(TakenRecord).filter(TakenRecord.phone == phone).delete()
-    # Delete family members linked to this phone
     db.query(FamilyMember).filter(
         FamilyMember.patient_phone == phone).delete()
     if user:
