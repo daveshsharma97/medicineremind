@@ -17,7 +17,7 @@ def get_db():
 
 @app.get("/")
 def home():
-    return {"message": "Welcome to MedicineRemind!"}
+    return {"message": "Welcome to MedBuddy!"}
     # Start reminder system in background
 @app.on_event("startup")
 def start_reminders():
@@ -33,9 +33,9 @@ def add_reminder(medicine_name: str,
                  reminder_time: str,
                  days: str = "Daily",
                  duration: str = "Ongoing",
+                 phone: str = "",
                  db: Session = Depends(get_db)):
     from datetime import datetime, timedelta
-    # Calculate end date based on duration
     end_date = ""
     if duration == "7 days":
         end_date = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
@@ -43,9 +43,9 @@ def add_reminder(medicine_name: str,
         end_date = (datetime.now() + timedelta(days=30)).strftime("%Y-%m-%d")
     elif duration == "3 months":
         end_date = (datetime.now() + timedelta(days=90)).strftime("%Y-%m-%d")
-    # Ongoing = empty (never expires)
 
     new_medicine = Medicine(
+        phone=phone,
         name=medicine_name,
         dose=dose,
         time=reminder_time,
@@ -57,7 +57,7 @@ def add_reminder(medicine_name: str,
     try:
         set_reminder(medicine_name, dose, reminder_time)
     except Exception as e:
-        print(f"Reminder error: {e}")   
+        print(f"Reminder error: {e}")
     return {
         "message": "Reminder set and saved!",
         "medicine": medicine_name,
@@ -67,12 +67,11 @@ def add_reminder(medicine_name: str,
 
 # GET all medicines for the app
 @app.get("/medicines")
-def get_medicines(db: Session = Depends(get_db)):
+def get_medicines(phone: str = "", db: Session = Depends(get_db)):
     from datetime import datetime
     today = datetime.now().strftime("%Y-%m-%d")
-    medicines = db.query(Medicine).all()
+    medicines = db.query(Medicine).filter(Medicine.phone == phone).all()
 
-    # Auto-delete expired medicines
     active_medicines = []
     for m in medicines:
         if m.end_date and m.end_date != "" and m.end_date < today:

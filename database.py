@@ -18,6 +18,7 @@ Base = declarative_base()
 class Medicine(Base):
     __tablename__ = "medicines"
     id = Column(Integer, primary_key=True, index=True)
+    phone = Column(String, default="")
     name = Column(String)
     time = Column(String)
     dose = Column(String)
